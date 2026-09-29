@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Quizopia - Test your knowledge with interactive quizzes"
+  />
+
+  <title>Quizopia | Quiz App</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #635bff;
+      --primary-dark: #4b43db;
+      --secondary: #ffb703;
+      --dark: #17172a;
+      --light: #f7f7fc;
+      --white: #ffffff;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --muted: #707080;
+      --border: #e5e5ef;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 20%, #e3e1ff 0, transparent 30%),
+        radial-gradient(circle at 90% 80%, #fff0c2 0, transparent 30%),
+        var(--light);
+      color: var(--dark);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    /* ================= HEADER ================= */
+
+    header {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7%;
+      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .logo span {
+      color: var(--secondary);
+    }
+
+    .high-score {
+      background: #f0efff;
+      color: var(--primary);
+      padding: 10px 16px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    /* ================= HOME ================= */
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .home {
+      width: min(1120px, 90%);
+      margin: auto;
+      padding: 65px 0;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 55px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: #ebeaff;
+      color: var(--primary);
+      padding: 8px 15px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      max-width: 750px;
+      margin: auto;
+      font-size: clamp(36px, 6vw, 68px);
+      line-height: 1.05;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      max-width: 620px;
+      margin: 20px auto;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .random-btn {
+      border: none;
+      color: white;
+      background: var(--primary);
+      padding: 15px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+      box-shadow: 0 10px 25px rgba(99, 91, 255, 0.25);
+    }
+
+    .random-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .section-title h2 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .category {
+      min-height: 150px;
+      background: var(--white);
+      border: 2px solid transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      padding: 25px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: 0.25s;
+      box-shadow: 0 8px 30px rgba(30, 30, 70, 0.07);
+    }
+
+    .category:hover {
+      border-color: var(--primary);
+      transform: translateY(-6px);
+      box-shadow: 0 15px 35px rgba(99, 91, 255, 0.14);
+    }
+
+    .category .icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      background: #f0efff;
+      border-radius: 16px;
+      font-size: 28px;
+    }
+
+    .category strong {
+      font-size: 15px;
+      text-align: center;
+    }
+
+    /* ================= QUIZ ================= */
+
+    .quiz-wrapper {
+      width: min(760px, 92%);
+      margin: 45px auto;
+    }
+
+    .quiz-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+
+    .quiz-category {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .question-number {
+      color: var(--muted);
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 10px;
+      background: #e9e9f2;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: inherit;
+      transition: width 0.35s;
+    }
+
+    .quiz-card {
+      background: white;
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: 0 15px 50px rgba(30, 30, 60, 0.09);
+    }
+
+    #question {
+      font-size: clamp(22px, 4vw, 30px);
+      line-height: 1.35;
+      margin-bottom: 28px;
+    }
+
+    .answers {
+      display: grid;
+      gap: 13px;
+    }
+
+    .answer {
+      width: 100%;
+      padding: 17px 20px;
+      text-align: left;
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: var(--dark);
+    }
+
+    .answer:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: #f8f7ff;
+    }
+
+    .answer.correct {
+      border-color: var(--success);
+      background: #effcf3;
+      color: #11602d;
+    }
+
+    .answer.wrong {
+      border-color: var(--danger);
+      background: #fff1f2;
+      color: #991b1b;
+    }
+
+    .answer:disabled {
+      cursor: default;
+    }
+
+    .option-letter {
+      min-width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: #f0efff;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    #feedback {
+      min-height: 24px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .feedback-correct {
+      color: var(--success);
+    }
+
+    .feedback-wrong {
+      color: var(--danger);
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 25px;
+      gap: 15px;
+    }
+
+    .secondary-btn,
+    .next-btn {
+      padding: 13px 22px;
+      border-radius: 11px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--dark);
+    }
+
+    .next-btn {
+      border: none;
+      background: var(--primary);
+      color: white;
+      display: none;
+    }
+
+    .next-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* ================= RESULTS ================= */
+
+    .result-wrapper {
+      min-height: calc(100vh - 74px);
+      display: grid;
+      place-items: center;
+      padding: 30px 15px;
+    }
+
+    .result-card {
+      width: min(520px, 95%);
+      background: white;
+      padding: 45px 35px;
+      text-align: center;
+      border-radius: 25px;
+      box-shadow: 0 15px 50px rgba(30, 30, 60, 0.1);
+    }
+
+    .result-icon {
+      font-size: 60px;
+      margin-bottom: 15px;
+    }
+
+    .result-card h2 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .result-message {
+      color: var(--muted);
+      margin-bottom: 27px;
+    }
+
+    .score-circle {
+      width: 155px;
+      height: 155px;
+      border-radius: 50%;
+      margin: 25px auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #f0efff;
+      border: 10px solid #dcd9ff;
+    }
+
+    .score-circle strong {
+      color: var(--primary);
+      font-size: 42px;
+    }
+
+    .score-circle span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 25px 0;
+    }
+
+    .stat {
+      background: #f8f8fb;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .result-buttons button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 11px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .restart {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    .home-btn {
+      border: 1px solid var(--border);
+      background: white;
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media (max-width: 850px) {
+      .categories {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      header {
+        padding: 0 4%;
+      }
+
+      .logo {
+        font-size: 21px;
+      }
+
+      .high-score {
+        font-size: 12px;
+        padding: 8px 11px;
+      }
+
+      .home {
+        padding-top: 40px;
+      }
+
+      .categories {
+        grid-template-columns: 1fr 1fr;
+        gap: 11px;
+      }
+
+      .category {
+        min-height: 125px;
+        padding: 15px 8px;
+      }
+
+      .category .icon {
+        width: 48px;
+        height: 48px;
+        font-size: 23px;
+      }
+
+      .category strong {
+        font-size: 13px;
+      }
+
+      .quiz-card {
+        padding: 24px 18px;
+      }
+
+      .quiz-actions {
+        flex-direction: column;
+      }
+
+      .quiz-actions button {
+        width: 100%;
+      }
+
+      .result-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Quiz<span>opia</span></div>
+
+  <div class="high-score">
+    🏆 Best:
+    <span id="headerHighScore">0</span>%
+  </div>
+</header>
+
+
+<!-- ================= HOME SCREEN ================= -->
+
+<main id="homeScreen" class="screen active">
+
+  <section class="home">
+
+    <div class="hero">
+
+      <span class="hero-badge">
+        🎯 PLAY • LEARN • IMPROVE
+      </span>
+
+      <h1>
+        Your Gateway to
+        <span>Trivia Nirvana!</span>
+      </h1>
+
+      <p>
+        Challenge yourself with fun quizzes from science,
+        technology, history, mathematics and more.
+      </p>
+
+      <button
+        class="random-btn"
+        id="randomQuizBtn"
+        type="button"
+      >
+        🎲 START RANDOM QUIZ
+      </button>
+
+    </div>
+
+
+    <div class="section-title">
+      <h2>Choose a Category</h2>
+      <p>Select your favourite topic and start playing.</p>
+    </div>
+
+
+    <div class="categories">
+
+      <button class="category" data-category="Indian History">
+        <span class="icon">🏛️</span>
+        <strong>INDIAN HISTORY</strong>
+      </button>
+
+      <button class="category" data-category="General Knowledge">
+        <span class="icon">🌎</span>
+        <strong>GENERAL KNOWLEDGE</strong>
+      </button>
+
+      <button class="category" data-category="Science">
+        <span class="icon">🔬</span>
+        <strong>SCIENCE</strong>
+      </button>
+
+      <button class="category" data-category="Mathematics">
+        <span class="icon">➗</span>
+        <strong>MATHEMATICS</strong>
+      </button>
+
+      <button class="category" data-category="Indian Geography">
+        <span class="icon">🗺️</span>
+        <strong>INDIAN GEOGRAPHY</strong>
+      </button>
+
+      <button class="category" data-category="Literature">
+        <span class="icon">📚</span>
+        <strong>LITERATURE</strong>
+      </button>
+
+      <button class="category" data-category="World History">
+        <span class="icon">🏺</span>
+        <strong>WORLD HISTORY</strong>
+      </button>
+
+      <button class="category" data-category="Technology">
+        <span class="icon">💻</span>
+        <strong>TECHNOLOGY</strong>
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- ================= QUIZ SCREEN ================= -->
+
+<main id="quizScreen" class="screen">
+
+  <section class="quiz-wrapper">
+
+    <div class="quiz-top">
+
+      <span
+        id="quizCategory"
+        class="quiz-category"
+      >
+        Quiz
+      </span>
+
+      <span
+        id="questionNumber"
+        class="question-number"
+      >
+        Question 1 / 5
+      </span>
+
+    </div>
+
+
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+
+
+    <article class="quiz-card">
+
+      <h2 id="question">
+        Question appears here
+      </h2>
+
+      <div
+        id="answers"
+        class="answers"
+        role="group"
+        aria-label="Quiz answers"
+      ></div>
+
+      <p
+        id="feedback"
+        aria-live="polite"
+      ></p>
+
+
+      <div class="quiz-actions">
+
+        <button
+          class="secondary-btn"
+          id="quitBtn"
+          type="button"
+        >
+          ← Quit Quiz
+        </button>
+
+        <button
+          class="next-btn"
+          id="nextBtn"
+          type="button"
+        >
+          Next Question →
+        </button>
+
+      </div>
+
+    </article>
+
+  </section>
+
+</main>
+
+
+<!-- ================= RESULT SCREEN ================= -->
+
+<main id="resultScreen" class="screen">
+
+  <section class="result-wrapper">
+
+    <article class="result-card">
+
+      <div id="resultIcon" class="result-icon">
+        🏆
+      </div>
+
+      <h2>Quiz Completed!</h2>
+
+      <p
+        id="resultMessage"
+        class="result-message"
+      ></p>
+
+
+      <div class="score-circle">
+
+        <strong id="percentageScore">
+          0%
+        </strong>
+
+        <span>YOUR SCORE</span>
+
+      </div>
+
+
+      <div class="result-stats">
+
+        <div class="stat">
+          <strong id="correctAnswers">0</strong>
+          <span>Correct</span>
+        </div>
+
+        <div class="stat">
+          <strong id="totalQuestions">0</strong>
+          <span>Total Questions</span>
+        </div>
+
+      </div>
+
+
+      <div class="result-buttons">
+
+        <button
+          class="home-btn"
+          id="homeBtn"
+          type="button"
+        >
+          Home
+        </button>
+
+        <button
+          class="restart"
+          id="restartBtn"
+          type="button"
+        >
+          Play Again
+        </button>
+
+      </div>
+
+    </article>
+
+  </section>
+
+</main>
+
+
+<script>
+
+"use strict";
+
+/* ==========================================
+   QUESTION DATABASE
+========================================== */
+
+const questionBank = [
+
+  {
+    category: "Indian History",
+    question: "Who was the first Prime Minister of independent India?",
+    answers: [
+      "Jawaharlal Nehru",
+      "Mahatma Gandhi",
+      "Sardar Patel",
+      "Rajendra Prasad"
+    ],
+    correct: 0
+  },
+
+  {
+    category: "Indian History",
+    question: "The Quit India Movement was launched in which year?",
+    answers: [
+      "1930",
+      "1942",
+      "1947",
+      "1920"
+    ],
+    correct: 1
+  },
+
+  {
+    category: "General Knowledge",
+    question: "Which is the largest ocean on Earth?",
+    answers: [
+      "Atlantic Ocean",
+      "Indian Ocean",
+      "Pacific Ocean",
+      "Arctic Ocean"
+    ],
+    correct: 2
+  },
+
+  {
+    category: "General Knowledge",
+    question: "What is the capital of Australia?",
+    answers: [
+      "Sydney",
+      "Canberra",
+      "Melbourne",
+      "Perth"
+    ],
+    correct: 1
+  },
+
+  {
+    category: "Science",
+    question: "Which planet is known as the Red Planet?",
+    answers: [
+      "Venus",
+      "Mars",
+      "Jupiter",
+      "Saturn"
+    ],
+    correct: 1
+  },
+
+  {
+    category: "Science",
+    question: "Which gas do plants mainly absorb from the atmosphere?",
+    answers: [
+      "Oxygen",
+      "Nitrogen",
+      "Carbon dioxide",
+      "Hydrogen"
+    ],
+    correct: 2
+  },
+
+  {
+    category: "Mathematics",
+    question: "What is 12 × 8?",
+    answers: [
+      "86",
+      "88",
+      "96",
+      "108"
+    ],
+    correct: 2
+  },
+
+  {
+    category: "Mathematics",
+    question: "What is the square root of 144?",
+    answers: [
+      "10",
+      "11",
+      "12",
+      "14"
+    ],
+    correct: 2
+  },
+
+  {
+    category: "Indian Geography",
+    question: "Which is the longest river in India?",
+    answers: [
+      "Yamuna",
+      "Godavari",
+      "Ganga",
+      "Narmada"
+    ],
+    correct: 2
+  },
+
+  {
+    category: "Indian Geography",
+    question: "Which is the largest Indian state by area?",
+    answers: [
+      "Maharashtra",
+      "Rajasthan",
+      "Madhya Pradesh",
+      "Uttar Pradesh"
+    ],
+    correct: 1
+  },
+
+  {
+    category: "Literature",
+    question: "Who wrote Romeo and Juliet?",
+    answers: [
+      "Charles Dickens",
+      "William Shakespeare",
+      "Jane Austen",
+      "George Orwell"
+    ],
+    correct: 1
+  },
+
+  {
+    category: "Literature",
+    question: "Who wrote the Harry Potter series?",
+    answers: [
+      "J. K. Rowling",
+      "George Orwell",
+      "J. R. R. Tolkien",
+      "Mark Twain"
+    ],
+    correct: 0
+  },
+
+  {
+    category: "World History",
+    question: "The ancient pyramids of Giza were built in which civilization?",
+    answers: [
+      "Roman",
+      "Egyptian",
+      "Greek",
+      "Mayan"
+    ],
+    correct: 1
+  },
+
+  {
+    category: "World History",
+    question: "In which year did World War II end?",
+    answers: [
+      "1942",
+      "1943",
+      "1945",
+      "1950"
+    ],
+    correct: 2
+  },
+
+  {
+    category: "Technology",
+    question: "What does HTML stand for?",
+    answers: [
+      "Hyper Text Markup Language",
+      "High Text Machine Language",
+      "Hyper Transfer Main Language",
+      "Home Tool Markup Language"
+    ],
+    correct: 0
+  },
+
+  {
+    category: "Technology",
+    question: "Which language is mainly used to style web pages?",
+    answers: [
+      "Python",
+      "CSS",
+      "Java",
+      "SQL"
+    ],
+    correct: 1
+  }
+
+];
+
+
+/* ==========================================
+   ELEMENTS
+========================================== */
+
+const homeScreen =
+  document.getElementById("homeScreen");
+
+const quizScreen =
+  document.getElementById("quizScreen");
+
+const resultScreen =
+  document.getElementById("resultScreen");
+
+const questionElement =
+  document.getElementById("question");
+
+const answersElement =
+  document.getElementById("answers");
+
+const feedbackElement =
+  document.getElementById("feedback");
+
+const nextBtn =
+  document.getElementById("nextBtn");
+
+const quitBtn =
+  document.getElementById("quitBtn");
+
+const progressBar =
+  document.getElementById("progressBar");
+
+const questionNumber =
+  document.getElementById("questionNumber");
+
+const quizCategory =
+  document.getElementById("quizCategory");
+
+const randomQuizBtn =
+  document.getElementById("randomQuizBtn");
+
+const restartBtn =
+  document.getElementById("restartBtn");
+
+const homeBtn =
+  document.getElementById("homeBtn");
+
+const headerHighScore =
+  document.getElementById("headerHighScore");
+
+
+/* ==========================================
+   STATE
+========================================== */
+
+let quizQuestions = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let selectedCategory = "Random Quiz";
+let answered = false;
+
+
+/* ==========================================
+   UTILITY
+========================================== */
+
+function shuffleArray(array) {
+
+  const copy = [...array];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+
+    const randomIndex =
+      Math.floor(Math.random() * (i + 1));
+
+    [copy[i], copy[randomIndex]] =
+      [copy[randomIndex], copy[i]];
+
+  }
+
+  return copy;
+
+}
+
+
+function showScreen(screen) {
+
+  document
+    .querySelectorAll(".screen")
+    .forEach(item =>
+      item.classList.remove("active")
+    );
+
+  screen.classList.add("active");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+/* ==========================================
+   HIGH SCORE
+========================================== */
+
+function getHighScore() {
+
+  try {
+
+    return Number(
+      localStorage.getItem("quizopiaHighScore")
+    ) || 0;
+
+  } catch (error) {
+
+    console.warn(
+      "Local storage unavailable:",
+      error
+    );
+
+    return 0;
+
+  }
+
+}
+
+
+function saveHighScore(value) {
+
+  try {
+
+    if (value > getHighScore()) {
+
+      localStorage.setItem(
+        "quizopiaHighScore",
+        String(value)
+      );
+
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "Unable to save high score:",
+      error
+    );
+
+  }
+
+}
+
+
+function updateHighScore() {
+
+  headerHighScore.textContent =
+    getHighScore();
+
+}
+
+
+/* ==========================================
+   START QUIZ
+========================================== */
+
+function startQuiz(category = null) {
+
+  currentQuestionIndex = 0;
+  score = 0;
+
+  if (category) {
+
+    selectedCategory = category;
+
+    quizQuestions =
+      questionBank.filter(
+        question =>
+          question.category === category
+      );
+
+  } else {
+
+    selectedCategory = "Random Quiz";
+
+    quizQuestions =
+      shuffleArray(questionBank).slice(0, 8);
+
+  }
+
+
+  quizQuestions =
+    shuffleArray(quizQuestions);
+
+
+  if (quizQuestions.length === 0) {
+
+    alert(
+      "No questions are available for this category."
+    );
+
+    return;
+
+  }
+
+
+  showScreen(quizScreen);
+
+  displayQuestion();
+
+}
+
+
+/* ==========================================
+   DISPLAY QUESTION
+========================================== */
+
+function displayQuestion() {
+
+  answered = false;
+
+  feedbackElement.textContent = "";
+
+  feedbackElement.className = "";
+
+  nextBtn.style.display = "none";
+
+
+  const currentQuestion =
+    quizQuestions[currentQuestionIndex];
+
+
+  if (!currentQuestion) {
+
+    showResults();
+    return;
+
+  }
+
+
+  quizCategory.textContent =
+    selectedCategory;
+
+
+  questionNumber.textContent =
+    `Question ${currentQuestionIndex + 1} / ${quizQuestions.length}`;
+
+
+  const progress =
+    ((currentQuestionIndex + 1) /
+      quizQuestions.length) * 100;
+
+
+  progressBar.style.width =
+    `${progress}%`;
+
+
+  /*
+    textContent is used instead of innerHTML
+    for user-visible data.
+  */
+
+  questionElement.textContent =
+    currentQuestion.question;
+
+
+  answersElement.textContent = "";
+
+
+  const letters =
+    ["A", "B", "C", "D"];
+
+
+  currentQuestion.answers.forEach(
+    (answer, index) => {
+
+      const button =
+        document.createElement("button");
+
+      button.type = "button";
+
+      button.className = "answer";
+
+
+      const letter =
+        document.createElement("span");
+
+      letter.className =
+        "option-letter";
+
+      letter.textContent =
+        letters[index];
+
+
+      const text =
+        document.createElement("span");
+
+      text.textContent =
+        answer;
+
+
+      button.appendChild(letter);
+      button.appendChild(text);
+
+
+      button.addEventListener(
+        "click",
+        () => checkAnswer(index, button)
+      );
+
+
+      answersElement.appendChild(button);
+
+    }
+  );
+
+}
+
+
+/* ==========================================
+   CHECK ANSWER
+========================================== */
+
+function checkAnswer(
+  selectedIndex,
+  selectedButton
+) {
+
+  if (answered) return;
+
+  answered = true;
+
+
+  const currentQuestion =
+    quizQuestions[currentQuestionIndex];
+
+
+  const buttons =
+    answersElement.querySelectorAll(
+      ".answer"
+    );
+
+
+  buttons.forEach(
+    button =>
+      button.disabled = true
+  );
+
+
+  if (
+    selectedIndex ===
+    currentQuestion.correct
+  ) {
+
+    score++;
+
+    selectedButton.classList.add(
+      "correct"
+    );
+
+    feedbackElement.textContent =
+      "✓ Correct! Great job.";
+
+    feedbackElement.className =
+      "feedback-correct";
+
+  } else {
+
+    selectedButton.classList.add(
+      "wrong"
+    );
+
+
+    buttons[
+      currentQuestion.correct
+    ].classList.add("correct");
+
+
+    feedbackElement.textContent =
+      `✗ Incorrect. Correct answer: ${
+        currentQuestion.answers[
+          currentQuestion.correct
+        ]
+      }`;
+
+
+    feedbackElement.className =
+      "feedback-wrong";
+
+  }
+
+
+  if (
+    currentQuestionIndex ===
+    quizQuestions.length - 1
+  ) {
+
+    nextBtn.textContent =
+      "View Results →";
+
+  } else {
+
+    nextBtn.textContent =
+      "Next Question →";
+
+  }
+
+
+  nextBtn.style.display =
+    "inline-block";
+
+}
+
+
+/* ==========================================
+   NEXT QUESTION
+========================================== */
+
+function nextQuestion() {
+
+  if (!answered) return;
+
+
+  currentQuestionIndex++;
+
+
+  if (
+    currentQuestionIndex <
+    quizQuestions.length
+  ) {
+
+    displayQuestion();
+
+  } else {
+
+    showResults();
+
+  }
+
+}
+
+
+/* ==========================================
+   RESULTS
+========================================== */
+
+function showResults() {
+
+  showScreen(resultScreen);
+
+
+  const percentage =
+    Math.round(
+      (score / quizQuestions.length) *
+      100
+    );
+
+
+  document.getElementById(
+    "percentageScore"
+  ).textContent =
+    `${percentage}%`;
+
+
+  document.getElementById(
+    "correctAnswers"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "totalQuestions"
+  ).textContent =
+    quizQuestions.length;
+
+
+  const resultMessage =
+    document.getElementById(
+      "resultMessage"
+    );
+
+
+  const resultIcon =
+    document.getElementById(
+      "resultIcon"
+    );
+
+
+  if (percentage >= 80) {
+
+    resultIcon.textContent = "🏆";
+
+    resultMessage.textContent =
+      "Excellent work! You really know your stuff.";
+
+  } else if (percentage >= 60) {
+
+    resultIcon.textContent = "🎉";
+
+    resultMessage.textContent =
+      "Good job! Keep learning and improving.";
+
+  } else if (percentage >= 40) {
+
+    resultIcon.textContent = "👍";
+
+    resultMessage.textContent =
+      "Nice attempt. A little more practice will help.";
+
+  } else {
+
+    resultIcon.textContent = "📚";
+
+    resultMessage.textContent =
+      "Keep learning and try again. You can improve!";
+
+  }
+
+
+  saveHighScore(percentage);
+
+  updateHighScore();
+
+}
+
+
+/* ==========================================
+   EVENTS
+========================================== */
+
+document
+  .querySelectorAll(".category")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const category =
+          button.dataset.category;
+
+        startQuiz(category);
+
+      }
+    );
+
+  });
+
+
+randomQuizBtn.addEventListener(
+  "click",
+  () => startQuiz()
+);
+
+
+nextBtn.addEventListener(
+  "click",
+  nextQuestion
+);
+
+
+restartBtn.addEventListener(
+  "click",
+  () => {
+
+    if (
+      selectedCategory ===
+      "Random Quiz"
+    ) {
+
+      startQuiz();
+
+    } else {
+
+      startQuiz(
+        selectedCategory
+      );
+
+    }
+
+  }
+);
+
+
+homeBtn.addEventListener(
+  "click",
+  () => {
+
+    showScreen(homeScreen);
+
+  }
+);
+
+
+quitBtn.addEventListener(
+  "click",
+  () => {
+
+    const shouldQuit =
+      confirm(
+        "Are you sure you want to quit this quiz?"
+      );
+
+    if (shouldQuit) {
+
+      showScreen(homeScreen);
+
+    }
+
+  }
+);
+
+
+/* ==========================================
+   KEYBOARD ACCESSIBILITY
+========================================== */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter" &&
+      quizScreen.classList.contains("active") &&
+      answered
+    ) {
+
+      nextQuestion();
+
+    }
+
+  }
+);
+
+
+/* ==========================================
+   INITIALIZE
+========================================== */
+
+updateHighScore();
+
+</script>
+
+</body>
+</html>
